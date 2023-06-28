@@ -6,6 +6,7 @@ import sys
 # Install required packages
 required_packages = [
     "streamlit",
+    "openai"
     "pdfplumber",
     "panel"
     #"textwrap"
