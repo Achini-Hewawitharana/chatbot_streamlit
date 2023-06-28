@@ -1,6 +1,7 @@
 # Install the required dependencies before deploying app on Streamlit
 import os
 import subprocess
+import sys
 
 # Install required packages
 required_packages = [
@@ -21,7 +22,7 @@ import panel as pn
 import textwrap
 
 # Set OpenAI API key
-# openai.api_key = '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'
+# openai.api_key = ''
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
