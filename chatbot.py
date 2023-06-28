@@ -7,8 +7,8 @@ import sys
 required_packages = [
     "streamlit",
     "pdfplumber",
-    "panel",
-    "textwrap"
+    "panel"
+    #"textwrap"
 ]
 
 for package in required_packages:
@@ -19,7 +19,7 @@ import streamlit as st
 import openai
 import pdfplumber
 import panel as pn
-import textwrap
+#import textwrap
 
 # Set OpenAI API key
 # openai.api_key = ''
