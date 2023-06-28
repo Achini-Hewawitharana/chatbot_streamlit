@@ -27,6 +27,7 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 # Helper function to get chatbot response
+
 def get_chatbot_response(user_input):
     messages = [{'role': 'system', 'content': user_input}]
     response = openai.ChatCompletion.create(
@@ -35,6 +36,7 @@ def get_chatbot_response(user_input):
         temperature=0.2
     )
     return response.choices[0].message['content']
+
 
 # Helper function to process uploaded PDFs
 def process_pdfs(file_uploads):
