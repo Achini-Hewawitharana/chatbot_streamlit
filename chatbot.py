@@ -1,3 +1,19 @@
+# Install the required dependencies before deploying app on Streamlit
+import os
+import subprocess
+
+# Install required packages
+required_packages = [
+    "streamlit",
+    "pdfplumber",
+    "panel",
+    "textwrap"
+]
+
+for package in required_packages:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+
 import streamlit as st
 import openai
 import pdfplumber
@@ -5,7 +21,10 @@ import panel as pn
 import textwrap
 
 # Set OpenAI API key
-openai.api_key = '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'
+# openai.api_key = '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'
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
 
 # Helper function to get chatbot response
 def get_chatbot_response(user_input):
