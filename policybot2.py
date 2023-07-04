@@ -202,10 +202,20 @@ with input_container:
         except Exception as e:
             st.error("An error occurred: {}".format(e))
 
+###################################################### Updated accoding to generate_response function --> returning an object with meta
 if st.session_state['generated']:
     # Display chat history in a container
     with response_container:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-            st.code(st.session_state["generated"][i].answer, language="python", line_numbers=False)
-            st.text("Source: " + st.session_state["generated"][i].metadata["source"])
+            response = st.session_state["generated"][i]
+            st.code(response["answer"], language="python", line_numbers=False)
+            st.text("Source: " + response["metadata"]["source"])
+
+# if st.session_state['generated']:
+#     # Display chat history in a container
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             st.code(st.session_state["generated"][i].answer, language="python", line_numbers=False)
+#             st.text("Source: " + st.session_state["generated"][i].metadata["source"])
