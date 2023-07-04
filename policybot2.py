@@ -1,4 +1,21 @@
 import os
+import subprocess
+import sys
+
+# Define the required packages
+required_packages = [
+    "pdfplumber"
+]
+
+# Check if packages are already installed
+installed_packages = subprocess.check_output([sys.executable, "-m", "pip", "list"]).decode("utf-8")
+packages_to_install = [package for package in required_packages if package not in installed_packages]
+
+# Install required packages if they are not already installed
+if packages_to_install:
+    subprocess.check_call([sys.executable, "-m", "pip", "install"] + packages_to_install)
+
+
 import pathlib
 import streamlit as st
 from streamlit_chat import message
