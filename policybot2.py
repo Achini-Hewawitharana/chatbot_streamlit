@@ -4,7 +4,8 @@ import sys
 
 # Define the required packages
 required_packages = [
-    "pdfplumber"
+    "pdfplumber",
+    "langchain"
 ]
 
 # Check if packages are already installed
