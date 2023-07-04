@@ -35,19 +35,19 @@ if 'messages' not in st.session_state:
 
 ###############################################################################
 # Ask user to enter OpenAI API key
-openai_api_key = st.text_input("Enter your OpenAI API Key", type='password')
+# openai_api_key = st.text_input("Enter your OpenAI API Key", type='password')
 
-# Create a button for the user to submit their API key
-if st.button('Submit'):
-    # Set the OpenAI API key as a secret key in Streamlit
-    st.secrets["openai_api_key"] = openai_api_key
+# # Create a button for the user to submit their API key
+# if st.button('Submit'):
+#     # Set the OpenAI API key as a secret key in Streamlit
+#     st.secrets["openai_api_key"] = openai_api_key
 
-    # Check if the API key is valid by making a simple API call
-    try:
-        models = openai.Model.list()
-        st.success("API key is valid!")
-    except Exception as e:
-        st.error("Error testing API key: {}".format(e))
+#     # Check if the API key is valid by making a simple API call
+#     try:
+#         models = openai.Model.list()
+#         st.success("API key is valid!")
+#     except Exception as e:
+#         st.error("Error testing API key: {}".format(e))
 #############################################################################
 
 # Get code from a repository and split the file into content and metadata
