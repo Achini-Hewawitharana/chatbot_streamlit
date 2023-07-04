@@ -16,7 +16,7 @@ from typing import List
 from langchain.schema import Document
 
 # Hide traceback
-st.set_option('client.showErrorDetails', False)
+# st.set_option('client.showErrorDetails', False)
 
 # Setting page title and header
 st.set_page_config(page_title="CODE CHAT", page_icon=":robot_face:")
