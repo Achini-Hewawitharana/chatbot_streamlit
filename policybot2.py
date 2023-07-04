@@ -4,8 +4,7 @@ import sys
 
 # Define the required packages
 required_packages = [
-    "pdfplumber",
-    "langchain"
+    "pdfplumber"
 ]
 
 # Check if packages are already installed
@@ -105,6 +104,19 @@ openai.api_key = openai_api_key
 ################################################################### Using pdfplumber to read and extract pdf content
 # Helper function to process PDFs using pdfplumber
 
+def get_pdf_docs(folder_path):
+    folder = pathlib.Path(folder_path)
+    print("Iterating through PDF files")
+
+    # Iterate over only .pdf files in the folder (including subdirectories)
+    for pdf_file in folder.glob("**/*.pdf"):
+        print(pdf_file)
+        with pdfplumber.open(pdf_file) as pdf:
+            text = ""
+            for page in pdf.pages:
+                text += page.extract_text()
+            yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+
 # def get_pdf_docs(folder_path):
 #     folder = pathlib.Path(folder_path)
 #     print("Iterating through PDF files")
@@ -115,33 +127,24 @@ openai.api_key = openai_api_key
 #             text = ""
 #             for page in pdf.pages:
 #                 text += page.extract_text()
-#             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
-
-def get_pdf_docs(folder_path):
-    folder = pathlib.Path(folder_path)
-    print("Iterating through PDF files")
-    # Iterate over only .pdf files in the folder (including subdirectories)
-    for pdf_file in folder.glob("**/*.pdf"):
-        print(pdf_file)
-        with pdfplumber.open(pdf_file) as pdf:
-            text = ""
-            for page in pdf.pages:
-                text += page.extract_text()
-            metadata = {
-                "source": str(pdf_file.name)  # Include the PDF file name in the metadata
-            }
-            yield Document(page_content=text, metadata=metadata)
+#             metadata = {
+#                 "source": str(pdf_file.name)  # Include the PDF file name in the metadata
+#             }
+#             yield Document(page_content=text, metadata=metadata)
 
 
 # Use the Python code text splitter from Langchain to create chunks
 def get_source_chunks(repo_path, pdf_folder_path): 
     source_chunks = []
     print("Creating source chunks")
+
     # Create a PythonCodeTextSplitter object for splitting the code
     splitter = PythonCodeTextSplitter(chunk_size=1024, chunk_overlap=30)
+
     # for source in get_repo_docs(repo_path):
     #     for chunk in splitter.split_text(source.page_content):
     #         source_chunks.append(Document(page_content=chunk, metadata=source.metadata))
+
     for pdf in get_pdf_docs(pdf_folder_path):
         for chunk in splitter.split_text(pdf.page_content):
             source_chunks.append(Document(page_content=chunk, metadata=pdf.metadata))
@@ -158,7 +161,7 @@ def generate_response(input_text):
 
     vector_db = None
 
-    source_chunks = get_source_chunks(REPO_PATH, os.path.join(REPO_PATH, "sample_policies"))
+    # source_chunks = get_source_chunks(REPO_PATH, os.path.join(REPO_PATH, "sample_policies"))
 
 
     # Check if Chroma DB exists
@@ -174,35 +177,35 @@ def generate_response(input_text):
         print(f'Loading Chroma DB from {CHROMA_DB_PATH}...')
         vector_db = Chroma(persist_directory=CHROMA_DB_PATH, embedding_function=OpenAIEmbeddings())
 
-    # Load a QA chain
-    qa_chain = load_qa_chain(OpenAI(temperature=1), chain_type="stuff")
-    qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
-    query_response = qa.run(input_text)
-
-    # Get the source metadata from the top retrieved document
-    source_metadata = None
-    if qa.retriever_results:
-        source_metadata = qa.retriever_results[0].metadata
-
-
-    # Example response object
-    response = {
-        "answer": query_response,  # Store the response text
-        "metadata": source_metadata  # Add necessary metadata
-    }
-
     # # Load a QA chain
     # qa_chain = load_qa_chain(OpenAI(temperature=1), chain_type="stuff")
     # qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     # query_response = qa.run(input_text)
 
+    # # Get the source metadata from the top retrieved document
+    # source_metadata = None
+    # if qa.retriever_results:
+    #     source_metadata = qa.retriever_results[0].metadata
+
+
     # # Example response object
     # response = {
     #     "answer": query_response,  # Store the response text
-    #     "metadata": {
-    #         "source": "source_name"  # Add necessary metadata
-    #     }
+    #     "metadata": source_metadata  # Add necessary metadata
     # }
+
+    # Load a QA chain
+    qa_chain = load_qa_chain(OpenAI(temperature=1), chain_type="stuff")
+    qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
+    query_response = qa.run(input_text)
+
+    # Example response object
+    response = {
+        "answer": query_response,  # Store the response text
+        "metadata": {
+            "source": "source_name"  # Add necessary metadata
+        }
+    }
 
     return response
 
@@ -229,15 +232,6 @@ with input_container:
             st.error("An error occurred: {}".format(e))
 
 ###################################################### Updated accoding to generate_response function --> returning an object with meta
-# if st.session_state['generated']:
-#     # Display chat history in a container
-#     with response_container:
-#         for i in range(len(st.session_state['generated'])):
-#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-#             response = st.session_state["generated"][i]
-#             st.code(response["answer"], language="python", line_numbers=False)
-#             st.text("Source: " + response["metadata"]["source"])
-
 if st.session_state['generated']:
     # Display chat history in a container
     with response_container:
@@ -245,6 +239,15 @@ if st.session_state['generated']:
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
             response = st.session_state["generated"][i]
             st.code(response["answer"], language="python", line_numbers=False)
-            if response["metadata"]:
-                st.text("Source: " + response["metadata"]["source"])
+            st.text("Source: " + response["metadata"]["source"])
+
+# if st.session_state['generated']:
+#     # Display chat history in a container
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             response = st.session_state["generated"][i]
+#             st.code(response["answer"], language="python", line_numbers=False)
+#             if response["metadata"]:
+#                 st.text("Source: " + response["metadata"]["source"])
 
