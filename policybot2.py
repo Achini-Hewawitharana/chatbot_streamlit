@@ -103,6 +103,19 @@ openai.api_key = openai_api_key
 
 ################################################################### Using pdfplumber to read and extract pdf content
 # Helper function to process PDFs using pdfplumber
+
+# def get_pdf_docs(folder_path):
+#     folder = pathlib.Path(folder_path)
+#     print("Iterating through PDF files")
+#     # Iterate over only .pdf files in the folder (including subdirectories)
+#     for pdf_file in folder.glob("**/*.pdf"):
+#         print(pdf_file)
+#         with pdfplumber.open(pdf_file) as pdf:
+#             text = ""
+#             for page in pdf.pages:
+#                 text += page.extract_text()
+#             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+
 def get_pdf_docs(folder_path):
     folder = pathlib.Path(folder_path)
     print("Iterating through PDF files")
@@ -113,7 +126,10 @@ def get_pdf_docs(folder_path):
             text = ""
             for page in pdf.pages:
                 text += page.extract_text()
-            yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+            metadata = {
+                "source": str(pdf_file.name)  # Include the PDF file name in the metadata
+            }
+            yield Document(page_content=text, metadata=metadata)
 
 
 # Use the Python code text splitter from Langchain to create chunks
@@ -134,23 +150,15 @@ def get_source_chunks(repo_path, pdf_folder_path):
 # This will also create the embeddings and store them in ChromaDB if it does not exist already
 def generate_response(input_text):
 
-    # # Get the OpenAI API key from environment variable
-    # openai_api_key = os.environ.get("OPENAI_API_KEY")
-
-    # # Set the OpenAI API key
-    # openai.api_key = openai_api_key
-
     # Define the path of the repository and Chroma DB 
     # to get the absolute path of the current script file 
     REPO_PATH = os.path.abspath(os.path.dirname(__file__))
     CHROMA_DB_PATH = os.path.join(REPO_PATH, "chromaDB")
 
-
-
-    # REPO_PATH = os.path.abspath("chatbot_streamlit")
-    # CHROMA_DB_PATH = f'./chroma/{os.path.basename(REPO_PATH)}'
-
     vector_db = None
+
+    # source_chunks = get_source_chunks(REPO_PATH, os.path.join(REPO_PATH, "sample_policies"))
+
 
     # Check if Chroma DB exists
     if not os.path.exists(CHROMA_DB_PATH):
@@ -170,13 +178,29 @@ def generate_response(input_text):
     qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     query_response = qa.run(input_text)
 
+    # Get the source metadata from the top retrieved document
+    source_metadata = None
+    if len(qa.retriever_results) > 0:
+        source_metadata = qa.retriever_results[0].metadata
+
     # Example response object
     response = {
         "answer": query_response,  # Store the response text
-        "metadata": {
-            "source": "source_name"  # Add necessary metadata
-        }
+        "metadata": source_metadata  # Add necessary metadata
     }
+
+    # # Load a QA chain
+    # qa_chain = load_qa_chain(OpenAI(temperature=1), chain_type="stuff")
+    # qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
+    # query_response = qa.run(input_text)
+
+    # # Example response object
+    # response = {
+    #     "answer": query_response,  # Store the response text
+    #     "metadata": {
+    #         "source": "source_name"  # Add necessary metadata
+    #     }
+    # }
 
     return response
 
@@ -203,6 +227,15 @@ with input_container:
             st.error("An error occurred: {}".format(e))
 
 ###################################################### Updated accoding to generate_response function --> returning an object with meta
+# if st.session_state['generated']:
+#     # Display chat history in a container
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             response = st.session_state["generated"][i]
+#             st.code(response["answer"], language="python", line_numbers=False)
+#             st.text("Source: " + response["metadata"]["source"])
+
 if st.session_state['generated']:
     # Display chat history in a container
     with response_container:
@@ -210,12 +243,6 @@ if st.session_state['generated']:
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
             response = st.session_state["generated"][i]
             st.code(response["answer"], language="python", line_numbers=False)
-            st.text("Source: " + response["metadata"]["source"])
+            if response["metadata"]:
+                st.text("Source: " + response["metadata"]["source"])
 
-# if st.session_state['generated']:
-#     # Display chat history in a container
-#     with response_container:
-#         for i in range(len(st.session_state['generated'])):
-#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-#             st.code(st.session_state["generated"][i].answer, language="python", line_numbers=False)
-#             st.text("Source: " + st.session_state["generated"][i].metadata["source"])
