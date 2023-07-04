@@ -33,6 +33,12 @@ if 'messages' not in st.session_state:
         {"role": "system", "content": "You are a helpful assistant."}
     ]
 
+# Get the OpenAI API key from environment variable
+openai_api_key = os.environ.get("OPENAI_API_KEY")
+
+# Set the OpenAI API key
+openai.api_key = openai_api_key
+
 ###############################################################################
 # Ask user to enter OpenAI API key
 # openai_api_key = st.text_input("Enter your OpenAI API Key", type='password')
@@ -95,11 +101,11 @@ def get_source_chunks(repo_path, pdf_folder_path):
 # This will also create the embeddings and store them in ChromaDB if it does not exist already
 def generate_response(input_text):
 
-    # Get the OpenAI API key from environment variable
-    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    # # Get the OpenAI API key from environment variable
+    # openai_api_key = os.environ.get("OPENAI_API_KEY")
 
-    # Set the OpenAI API key
-    openai.api_key = openai_api_key
+    # # Set the OpenAI API key
+    # openai.api_key = openai_api_key
 
     # Define the path of the repository and Chroma DB 
     # to get the absolute path of the current script file 
