@@ -169,7 +169,16 @@ def generate_response(input_text):
     qa_chain = load_qa_chain(OpenAI(temperature=1), chain_type="stuff")
     qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     query_response = qa.run(input_text)
-    return query_response
+
+    # Example response object
+    response = {
+        "answer": query_response,  # Store the response text
+        "metadata": {
+            "source": "source_name"  # Add necessary metadata
+        }
+    }
+
+    return response
 
 # From here is the code for creating the chat bot using Streamlit and streamlit_chat
 # container for chat history
