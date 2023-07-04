@@ -18,8 +18,6 @@ from langchain.schema import Document
 # Hide traceback
 st.set_option('client.showErrorDetails', False)
 
-# st.set_option('browser.gatherUsageStats', False)
-
 # Setting page title and header
 st.set_page_config(page_title="CODE CHAT", page_icon=":robot_face:")
 st.markdown("<h1 style='text-align: center; color: red;'>PUBLIC POLICY CHATBOT</h1>", unsafe_allow_html=True)
