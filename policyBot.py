@@ -1,4 +1,16 @@
 import os
+import PyPDF2
+from langchain.text_splitter import RecursiveCharacterTextSplitter, Document
+from langchain.vectorstores import Chroma
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.chains import RetrievalQA
+from langchain.llms import OpenAI
+import streamlit as st
+
+import openai
+# import pdfplumber
+# import panel as pn
+
 import subprocess
 import sys
 
@@ -19,18 +31,6 @@ packages_to_install = [package for package in required_packages if package not i
 # Install required packages if they are not already installed
 if packages_to_install:
     subprocess.check_call([sys.executable, "-m", "pip", "install"] + packages_to_install)
-
-import PyPDF2
-from langchain.text_splitter import RecursiveCharacterTextSplitter, Document
-from langchain.vectorstores import Chroma
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.chains import RetrievalQA
-from langchain.llms import OpenAI
-import streamlit as st
-
-import openai
-# import pdfplumber
-# import panel as pn
 
 
 # Specify the directory path containing the PDF files

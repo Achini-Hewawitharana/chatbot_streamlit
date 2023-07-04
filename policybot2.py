@@ -14,9 +14,10 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain.chains import RetrievalQA
 from typing import List
 from langchain.schema import Document
+import pdfplumber
 
 # Hide traceback
-# st.set_option('client.showErrorDetails', False)
+st.set_option('client.showErrorDetails', False)
 
 # Setting page title and header
 st.set_page_config(page_title="CODE CHAT", page_icon=":robot_face:")
@@ -68,20 +69,35 @@ openai.api_key = openai_api_key
 #             rel_path = codefile.relative_to(repo)
 #             yield Document(page_content=file.read(), metadata={"source": str(rel_path)})
 
+# def get_pdf_docs(folder_path):
+#     folder = pathlib.Path(folder_path)
+#     print("Iterating through PDF files")
+#     # Iterate over only .pdf files in the folder (including subdirectories)
+#     for pdf_file in folder.glob("**/*.pdf"):
+#         print(pdf_file)
+#         with open(pdf_file, "rb") as file:
+#             pdf_reader = PyPDF2.PdfFileReader(file)
+#             num_pages = pdf_reader.numPages
+#             text = ""
+#             for page_num in range(num_pages):
+#                 page = pdf_reader.getPage(page_num)
+#                 text += page.extract_text()
+#             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+
+################################################################### Using pdfplumber to read and extract pdf content
+# Helper function to process PDFs using pdfplumber
 def get_pdf_docs(folder_path):
     folder = pathlib.Path(folder_path)
     print("Iterating through PDF files")
     # Iterate over only .pdf files in the folder (including subdirectories)
     for pdf_file in folder.glob("**/*.pdf"):
         print(pdf_file)
-        with open(pdf_file, "rb") as file:
-            pdf_reader = PyPDF2.PdfFileReader(file)
-            num_pages = pdf_reader.numPages
+        with pdfplumber.open(pdf_file) as pdf:
             text = ""
-            for page_num in range(num_pages):
-                page = pdf_reader.getPage(page_num)
+            for page in pdf.pages:
                 text += page.extract_text()
             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+
 
 # Use the Python code text splitter from Langchain to create chunks
 def get_source_chunks(repo_path, pdf_folder_path): 
