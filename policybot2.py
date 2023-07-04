@@ -180,8 +180,9 @@ def generate_response(input_text):
 
     # Get the source metadata from the top retrieved document
     source_metadata = None
-    if len(qa.retriever_results) > 0:
+    if qa.retriever_results:
         source_metadata = qa.retriever_results[0].metadata
+
 
     # Example response object
     response = {
