@@ -18,10 +18,12 @@ from langchain.schema import Document
 # Hide traceback
 st.set_option('client.showErrorDetails', False)
 
+st.set_option('browser.gatherUsageStats', False)
+
 # Setting page title and header
 st.set_page_config(page_title="CODE CHAT", page_icon=":robot_face:")
-st.markdown("<h1 style='text-align: center; color: red;'>CODE CHAT</h1>", unsafe_allow_html=True)
-st.markdown("<h3 style='text-align: center;'>Perform queries on your GIT REPO</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: red;'>PUBLIC POLICY CHATBOT</h1>", unsafe_allow_html=True)
+st.markdown("<h3 style='text-align: center;'>Get to know the Public Policies at DxDy</h1>", unsafe_allow_html=True)
 
 # Initialise session state variables
 if 'generated' not in st.session_state:
@@ -33,6 +35,7 @@ if 'messages' not in st.session_state:
         {"role": "system", "content": "You are a helpful assistant."}
     ]
 
+###############################################################################
 # Ask user to enter OpenAI API key
 openai_api_key = st.text_input("Enter your OpenAI API Key", type='password')
 
@@ -47,18 +50,19 @@ if st.button('Submit'):
         st.success("API key is valid!")
     except Exception as e:
         st.error("Error testing API key: {}".format(e))
+#############################################################################
 
 # Get code from a repository and split the file into content and metadata
 
-def get_repo_docs(repo_path):
-    repo = pathlib.Path(repo_path)
-    print ("Iterating through git files")
-    # Iterate over only .ipynb files in the repo (including subdirectories) 
-    for codefile in repo.glob("**/*.ipynb"):
-        print(codefile)
-        with open(codefile, "r") as file:
-            rel_path = codefile.relative_to(repo)
-            yield Document(page_content=file.read(), metadata={"source": str(rel_path)})
+# def get_repo_docs(repo_path):
+#     repo = pathlib.Path(repo_path)
+#     print ("Iterating through git files")
+#     # Iterate over only .ipynb files in the repo (including subdirectories) 
+#     for codefile in repo.glob("**/*.ipynb"):
+#         print(codefile)
+#         with open(codefile, "r") as file:
+#             rel_path = codefile.relative_to(repo)
+#             yield Document(page_content=file.read(), metadata={"source": str(rel_path)})
 
 def get_pdf_docs(folder_path):
     folder = pathlib.Path(folder_path)
@@ -81,9 +85,9 @@ def get_source_chunks(repo_path, pdf_folder_path):
     print("Creating source chunks")
     # Create a PythonCodeTextSplitter object for splitting the code
     splitter = PythonCodeTextSplitter(chunk_size=1024, chunk_overlap=30)
-    for source in get_repo_docs(repo_path):
-        for chunk in splitter.split_text(source.page_content):
-            source_chunks.append(Document(page_content=chunk, metadata=source.metadata))
+    # for source in get_repo_docs(repo_path):
+    #     for chunk in splitter.split_text(source.page_content):
+    #         source_chunks.append(Document(page_content=chunk, metadata=source.metadata))
     for pdf in get_pdf_docs(pdf_folder_path):
         for chunk in splitter.split_text(pdf.page_content):
             source_chunks.append(Document(page_content=chunk, metadata=pdf.metadata))
@@ -100,8 +104,14 @@ def generate_response(input_text):
     openai.api_key = openai_api_key
 
     # Define the path of the repository and Chroma DB 
-    REPO_PATH = os.path.abspath("chatbot_streamlit")
-    CHROMA_DB_PATH = f'./chroma/{os.path.basename(REPO_PATH)}'
+    # to get the absolute path of the current script file 
+    REPO_PATH = os.path.abspath(os.path.dirname(__file__))
+    CHROMA_DB_PATH = os.path.join(REPO_PATH, "chromaDB")
+
+
+
+    # REPO_PATH = os.path.abspath("chatbot_streamlit")
+    # CHROMA_DB_PATH = f'./chroma/{os.path.basename(REPO_PATH)}'
 
     vector_db = None
 
