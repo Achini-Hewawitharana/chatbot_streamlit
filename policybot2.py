@@ -158,7 +158,7 @@ def generate_response(input_text):
 
     vector_db = None
 
-    # source_chunks = get_source_chunks(REPO_PATH, os.path.join(REPO_PATH, "sample_policies"))
+    source_chunks = get_source_chunks(REPO_PATH, os.path.join(REPO_PATH, "sample_policies"))
 
 
     # Check if Chroma DB exists
