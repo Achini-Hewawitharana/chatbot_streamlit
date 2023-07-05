@@ -169,15 +169,28 @@ with input_container:
             st.error("An error occurred: {}".format(e))
 
 ###################################################### Updated accoding to generate_response function --> returning an object with meta
+# if st.session_state['generated']:
+#     # Display chat history in a container
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             response = st.session_state["generated"][i]
+#             if response["answer"] is not None:
+#                 st.code(response["answer"], language="python", line_numbers=False)
+#             else:
+#                 st.write("No answer found.")
+#             if response["metadata"]["source"] is not None:
+#                 st.text("Source: " + response["metadata"]["source"])
+
 if st.session_state['generated']:
     # Display chat history in a container
     with response_container:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
             response = st.session_state["generated"][i]
-            if response["answer"] is not None:
+            if response["answer"]:
                 st.code(response["answer"], language="python", line_numbers=False)
             else:
                 st.write("No answer found.")
-            if response["metadata"]["source"] is not None:
+            if response["metadata"]["source"]:
                 st.text("Source: " + response["metadata"]["source"])
