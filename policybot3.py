@@ -37,7 +37,7 @@ import pdfplumber
 st.set_option('client.showErrorDetails', False)
 
 # Setting page title and header
-st.set_page_config(page_title="CODE CHAT", page_icon=":poop:")
+st.set_page_config(page_title="CODE CHAT", page_icon=":hugging_face:")
 st.markdown("<h1 style='text-align: center; color: red;'>PUBLIC POLICY CHATBOT</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center;'>Get to know the Public Policies at DxDy</h1>", unsafe_allow_html=True)
 
@@ -179,20 +179,6 @@ with input_container:
         except Exception as e:
             st.error("An error occurred: {}".format(e))
 
-if st.session_state['generated']:
-    # Display chat history in a container
-    with response_container:
-        for i in range(len(st.session_state['generated'])):
-            message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-            response = st.session_state["generated"][i]
-            if response["answer"]:
-                st.code(response["answer"], language="python", line_numbers=False)
-            else:
-                st.write("No answer found.")
-            if response["metadata"]["source"] is not None:
-                st.text("Source: " + response["metadata"]["source"])
-
-
 # if st.session_state['generated']:
 #     # Display chat history in a container
 #     with response_container:
@@ -203,5 +189,28 @@ if st.session_state['generated']:
 #                 st.code(response["answer"], language="python", line_numbers=False)
 #             else:
 #                 st.write("No answer found.")
-#             if response["metadata"]["source"]:
+#             if response["metadata"]["source"] is not None:
 #                 st.text("Source: " + response["metadata"]["source"])
+
+###############################################################
+
+if st.session_state['generated']:
+    # Display chat history in a container
+    with response_container:
+        for i in range(len(st.session_state['generated'])):
+            message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+            response = st.session_state["generated"][i]
+            if response["answer"]:
+                points = response["answer"].split("\n")
+                if len(points) > 1:
+                    list_items = "\n".join([f"1. {point}" for point in points])
+                    st.markdown(list_items)
+                else:
+                    st.code(response["answer"], language="python", line_numbers=False)
+            else:
+                st.write("No answer found.")
+            if response["metadata"]["source"]:
+                st.text("Source: " + response["metadata"]["source"])
+            else:
+                st.text("Source: No source available")
+
