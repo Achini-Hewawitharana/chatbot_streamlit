@@ -149,9 +149,9 @@ def generate_response(input_text):
 
    # Example response object
     response = {
-    "answer": query_response,  # Store the response text
-    "metadata": {
-        "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
+        "answer": query_response,  # Store the response text
+        "metadata": {
+            "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
         }
     }
 
