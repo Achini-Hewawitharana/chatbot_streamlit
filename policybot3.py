@@ -37,7 +37,7 @@ import pdfplumber
 st.set_option('client.showErrorDetails', False)
 
 # Setting page title and header
-st.set_page_config(page_title="CODE CHAT", page_icon=":robot_face:")
+st.set_page_config(page_title="CODE CHAT", page_icon=":poop:")
 st.markdown("<h1 style='text-align: center; color: red;'>PUBLIC POLICY CHATBOT</h1>", unsafe_allow_html=True)
 st.markdown("<h3 style='text-align: center;'>Get to know the Public Policies at DxDy</h1>", unsafe_allow_html=True)
 
@@ -154,8 +154,6 @@ def generate_response(input_text):
             "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
         }
     }
-
-
     return response
 
 
@@ -181,20 +179,6 @@ with input_container:
         except Exception as e:
             st.error("An error occurred: {}".format(e))
 
-###################################################### Updated accoding to generate_response function --> returning an object with meta
-# if st.session_state['generated']:
-#     # Display chat history in a container
-#     with response_container:
-#         for i in range(len(st.session_state['generated'])):
-#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
-#             response = st.session_state["generated"][i]
-#             if response["answer"] is not None:
-#                 st.code(response["answer"], language="python", line_numbers=False)
-#             else:
-#                 st.write("No answer found.")
-#             if response["metadata"]["source"] is not None:
-#                 st.text("Source: " + response["metadata"]["source"])
-
 if st.session_state['generated']:
     # Display chat history in a container
     with response_container:
@@ -205,5 +189,19 @@ if st.session_state['generated']:
                 st.code(response["answer"], language="python", line_numbers=False)
             else:
                 st.write("No answer found.")
-            if response["metadata"]["source"]:
+            if response["metadata"]["source"] is not None:
                 st.text("Source: " + response["metadata"]["source"])
+
+
+# if st.session_state['generated']:
+#     # Display chat history in a container
+#     with response_container:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
+#             response = st.session_state["generated"][i]
+#             if response["answer"]:
+#                 st.code(response["answer"], language="python", line_numbers=False)
+#             else:
+#                 st.write("No answer found.")
+#             if response["metadata"]["source"]:
+#                 st.text("Source: " + response["metadata"]["source"])
