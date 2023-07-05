@@ -209,8 +209,7 @@ if st.session_state['generated']:
                     st.code(response["answer"], language="python", line_numbers=False)
             else:
                 st.write("No answer found.")
-            if response["metadata"]["source"]:
+            if "source" in response["metadata"] and response["metadata"]["source"]:
                 st.text("Source: " + response["metadata"]["source"])
             else:
                 st.text("Source: No source available")
-
