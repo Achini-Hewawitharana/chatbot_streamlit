@@ -138,9 +138,9 @@ def generate_response(input_text):
 
     # Example response object
     response = {
-        "answer": query_response.answer if query_response else None,  # Store the response text
+        "answer": query_response.answer if query_response and hasattr(query_response, 'answer') else None,  # Store the response text if it exists
         "metadata": {
-            "source": query_response.metadata["source"] if query_response else None  # Retrieve the actual source name if it exists
+            "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
         }
     }
     return response
@@ -175,10 +175,9 @@ if st.session_state['generated']:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
             response = st.session_state["generated"][i]
-            if response["answer"]:
+            if response["answer"] is not None:
                 st.code(response["answer"], language="python", line_numbers=False)
             else:
                 st.write("No answer found.")
-            if response["metadata"]["source"]:
+            if response["metadata"]["source"] is not None:
                 st.text("Source: " + response["metadata"]["source"])
-
