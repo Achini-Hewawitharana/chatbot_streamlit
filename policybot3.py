@@ -139,13 +139,23 @@ def generate_response(input_text):
     qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     query_response = qa.run(input_text)
 
-    # Example response object
+    # # Example response object
+    # response = {
+    #     "answer": query_response.answer if query_response and hasattr(query_response, 'answer') else None,  # Store the response text if it exists
+    #     "metadata": {
+    #         "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
+    #     }
+    # }
+
+   # Example response object
     response = {
-        "answer": query_response.answer if query_response and hasattr(query_response, 'answer') else None,  # Store the response text if it exists
-        "metadata": {
-            "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
+    "answer": query_response,  # Store the response text
+    "metadata": {
+        "source": query_response.metadata["source"] if query_response and hasattr(query_response, 'metadata') else None  # Retrieve the actual source name if it exists
         }
     }
+
+
     return response
 
 
