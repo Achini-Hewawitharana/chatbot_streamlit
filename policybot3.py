@@ -79,6 +79,11 @@ def get_pdf_docs(folder_path):
             text = ""
             for page in pdf.pages:
                 text += page.extract_text()
+
+            metadata = {
+                "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
+            }
+
             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
 
 
@@ -131,11 +136,19 @@ def generate_response(input_text):
     qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     query_response = qa.run(input_text)
 
+    # # Example response object
+    # response = {
+    #     "answer": query_response,  # Store the response text
+    #     "metadata": {
+    #         "source": query_response.metadata["source"]  # Retrieve the actual source name
+    #     }
+    # }
+
     # Example response object
     response = {
-        "answer": query_response,  # Store the response text
+        "answer": query_response.answer,  # Store the response text
         "metadata": {
-            "source": query_response.metadata["source"]  # Retrieve the actual source name
+            "source": query_response.documents[0].metadata["source"]  # Retrieve the actual source name
         }
     }
     return response
