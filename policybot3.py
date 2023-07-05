@@ -136,22 +136,15 @@ def generate_response(input_text):
     qa = RetrievalQA(combine_documents_chain=qa_chain, retriever=vector_db.as_retriever())
     query_response = qa.run(input_text)
 
-    # # Example response object
-    # response = {
-    #     "answer": query_response,  # Store the response text
-    #     "metadata": {
-    #         "source": query_response.metadata["source"]  # Retrieve the actual source name
-    #     }
-    # }
-
     # Example response object
     response = {
         "answer": query_response.answer if query_response else None,  # Store the response text
         "metadata": {
-            "source": query_response.metadata["source"] if query_response else None  # Retrieve the actual source name
+            "source": query_response.metadata["source"] if query_response else None  # Retrieve the actual source name if it exists
         }
     }
     return response
+
 
 # From here is the code for creating the chat bot using Streamlit and streamlit_chat
 # container for chat history
@@ -182,6 +175,10 @@ if st.session_state['generated']:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state["past"][i], is_user=True, key=str(i) + '_user')
             response = st.session_state["generated"][i]
-            st.code(response["answer"], language="python", line_numbers=False)
-            st.text("Source: " + response["metadata"]["source"])
+            if response["answer"]:
+                st.code(response["answer"], language="python", line_numbers=False)
+            else:
+                st.write("No answer found.")
+            if response["metadata"]["source"]:
+                st.text("Source: " + response["metadata"]["source"])
 
