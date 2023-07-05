@@ -135,7 +135,7 @@ def generate_response(input_text):
     response = {
         "answer": query_response,  # Store the response text
         "metadata": {
-            "source": vector_db.get_metadata(query_response.document_id)["source"]  # Retrieve the actual source name
+            "source": query_response.metadata["source"]  # Retrieve the actual source name
         }
     }
     return response
