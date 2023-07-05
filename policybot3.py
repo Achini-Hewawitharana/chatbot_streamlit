@@ -75,19 +75,39 @@ def get_pdf_docs(folder_path):
     # Iterate over only .pdf files in the folder (including subdirectories)
     for pdf_file in folder.glob("**/*.pdf"):
         print(pdf_file)
-        metadata=""
+        metadata = {
+            "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
+        }
         
         with pdfplumber.open(pdf_file) as pdf:
             text = ""
             for page in pdf.pages:
                 text += page.extract_text()
 
-                metadata = {
-                    "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
-                }
-                print(metadata)
+        yield Document(page_content=text, metadata=metadata)
 
-            yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
+
+
+# def get_pdf_docs(folder_path):
+#     folder = pathlib.Path(folder_path)
+#     print("Iterating through PDF files")
+
+#     # Iterate over only .pdf files in the folder (including subdirectories)
+#     for pdf_file in folder.glob("**/*.pdf"):
+#         print(pdf_file)
+#         metadata=""
+        
+#         with pdfplumber.open(pdf_file) as pdf:
+#             text = ""
+#             for page in pdf.pages:
+#                 text += page.extract_text()
+
+#                 metadata = {
+#                     "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
+#                 }
+#                 print(metadata)
+
+#             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
 
 
 # Use the Python code text splitter from Langchain to create chunks
