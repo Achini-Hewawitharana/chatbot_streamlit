@@ -146,9 +146,9 @@ def generate_response(input_text):
 
     # Example response object
     response = {
-        "answer": query_response["answer"],  # Store the response text
+        "answer": query_response.answer if query_response else None,  # Store the response text
         "metadata": {
-            "source": query_response["metadata"]["source"]  # Retrieve the actual source name
+            "source": query_response.metadata["source"] if query_response else None  # Retrieve the actual source name
         }
     }
     return response
