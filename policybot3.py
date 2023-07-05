@@ -75,14 +75,17 @@ def get_pdf_docs(folder_path):
     # Iterate over only .pdf files in the folder (including subdirectories)
     for pdf_file in folder.glob("**/*.pdf"):
         print(pdf_file)
+        metadata=""
+        
         with pdfplumber.open(pdf_file) as pdf:
             text = ""
             for page in pdf.pages:
                 text += page.extract_text()
 
-            metadata = {
-                "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
-            }
+                metadata = {
+                    "source": str(pdf_file.relative_to(folder))  # Include the actual source name here
+                }
+                print(metadata)
 
             yield Document(page_content=text, metadata={"source": str(pdf_file.relative_to(folder))})
 
